@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#08090d">
+<title>REELX — Future Downloader</title>
+
+<style>
+:root {
+  --bg: #08090d;
+  --panel: rgba(255,255,255,0.045);
+  --line: rgba(255,255,255,0.10);
+  --text: #f4f5fa;
+  --muted: #858897;
+  --accent: #b9ff6a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% 0%, #202b27 0%, transparent 48%),
+    var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 22px;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .13;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 38px 38px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+.app {
+  width: 100%;
+  max-width: 390px;
+  position: relative;
+  animation: appear .8s ease both;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 70px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.brand-icon {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(185,255,106,.5);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  box-shadow: 0 0 22px rgba(185,255,106,.08);
+}
+
+.status { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); }
+
+.status::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-right: 7px;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.hero { text-align: center; margin-bottom: 35px; }
+
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-size: clamp(37px, 11vw, 49px);
+  line-height: 1.05;
+  letter-spacing: -2.5px;
+  font-weight: 750;
+}
+
+h1 span { color: var(--accent); }
+
+.subtitle { color: var(--muted); font-size: 13px; margin-top: 15px; line-height: 1.8; }
+
+.card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 23px;
+  background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.018));
+  box-shadow: 0 24px 70px rgba(0,0,0,.28);
+  backdrop-filter: blur(20px);
+}
+
+.field-label {
+  display: block;
+  color: #a4a7b3;
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin: 2px 0 12px 2px;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.24);
+  border-radius: 13px;
+  padding: 0 13px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.input-wrap:focus-within {
+  border-color: rgba(185,255,106,.6);
+  box-shadow: 0 0 0 3px rgba(185,255,106,.06);
+}
+
+.link-icon { color: var(--accent); font-size: 19px; }
+
+input {
+  width: 100%;
+  min-width: 0;
+  height: 52px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 13px;
+}
+
+input::placeholder { color: #666a77; }
+
+.buttons {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  gap: 10px;
+  margin-top: 13px;
+}
+
+button {
+  height: 49px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+  transition: transform .18s, opacity .18s, box-shadow .18s;
+}
+
+button:active { transform: scale(.97); }
+button:disabled { opacity: .55; cursor: wait; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.paste { background: rgba(255,255,255,.045); color: #e8e9ee; }
+
+.download {
+  background: var(--accent);
+  color: #11150c;
+  border-color: transparent;
+  box-shadow: 0 5px 24px rgba(185,255,106,.12);
+}
+
+.download:hover { box-shadow: 0 5px 32px rgba(185,255,106,.25); }
+
+.message {
+  min-height: 22px;
+  margin-top: 14px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.message.error { color: #ff8f8f; }
+
+/* result area */
+.result { margin-top: 14px; display: none; }
+.result.show { display: block; }
+
+.result video {
+  width: 100%;
+  max-height: 55vh;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: #000;
+}
+
+.result .title {
+  margin: 10px 2px 12px;
+  font-size: 12px;
+  color: #c9ccd8;
+  word-break: break-word;
+}
+
+.save {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  height: 49px;
+  line-height: 49px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #11150c;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 5px 24px rgba(185,255,106,.12);
+}
+
+.bottom {
+  margin-top: 27px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: #656978;
+}
+
+.bottom span::before { content: "✦"; color: var(--accent); margin-right: 6px; }
+
+.footer {
+  margin-top: 65px;
+  text-align: center;
+  color: #555966;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.note {
+  margin-top: 14px;
+  text-align: center;
+  color: #555966;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+@media (max-height: 720px) {
+  .top { margin-bottom: 40px; }
+  .footer { margin-top: 35px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app { animation: none; }
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+  <header class="top">
+    <div class="brand">
+      <div class="brand-icon">↗</div>
+      REELX
+    </div>
+    <div class="status">SYSTEM READY</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">THE NEXT GENERATION</div>
+    <h1>Save the<br><span>moment.</span></h1>
+    <p class="subtitle">
+      One link. One tap.<br>
+      Your favourite reels, within reach.
+    </p>
+  </section>
+
+  <section class="card">
+
+    <label class="field-label" for="reelLink">INSTAGRAM REEL LINK</label>
+
+    <div class="input-wrap">
+      <span class="link-icon">↗</span>
+      <input id="reelLink" type="url" placeholder="Paste your reel URL..."
+             autocomplete="url" inputmode="url">
+    </div>
+
+    <div class="buttons">
+      <button class="paste" id="pasteBtn" type="button">↓ &nbsp; Paste</button>
+      <button class="download" id="downloadBtn" type="button">Download &nbsp; ↗</button>
+    </div>
+
+    <p class="message" id="message" aria-live="polite">Ready when you are.</p>
+
+    <div class="result" id="out"></div>
+
+  </section>
+
+  <div class="bottom">
+    <span>MINIMAL UI</span>
+    <span>FAST ACCESS</span>
+    <span>2050 DESIGN</span>
+  </div>
+
+  <p class="note">Save only videos you own or have permission to use.</p>
+
+  <footer class="footer">REIMAGINE YOUR DIGITAL SPACE</footer>
+
+</main>
+
+<script>
+/* Same server serves this page and the API, so leave empty.
+   Only fill this if the page is hosted somewhere else, e.g. "https://myapp.onrender.com" */
+const API = "";
+
+const linkInput = document.getElementById("reelLink");
+const message = document.getElementById("message");
+const pasteBtn = document.getElementById("pasteBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const out = document.getElementById("out");
+
+function showMessage(text, isError) {
+  message.textContent = text;
+  message.classList.toggle("error", !!isError);
+}
+
+function isInstagramReel(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    return (
+      (host === "instagram.com" || host.endsWith(".instagram.com")) &&
+      /^\/(reel|reels|p|tv)\/[^/]+\/?/.test(url.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
+
+pasteBtn.addEventListener("click", async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) {
+      showMessage("Clipboard is empty. Copy a reel link first.", true);
+      return;
+    }
+    linkInput.value = text.trim();
+    showMessage("Link pasted. Tap Download.");
+  } catch {
+    linkInput.focus();
+    showMessage("Clipboard access unavailable. Paste the link in the box.", true);
+  }
+});
+
+linkInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") downloadBtn.click();
+});
+
+downloadBtn.addEventListener("click", async () => {
+  const link = linkInput.value.trim();
+  out.classList.remove("show");
+  out.textContent = "";
+
+  if (!link) {
+    showMessage("Paste an Instagram Reel link first.", true);
+    linkInput.focus();
+    return;
+  }
+  if (!isInstagramReel(link)) {
+    showMessage("Please enter a valid Instagram Reel URL.", true);
+    return;
+  }
+
+  downloadBtn.disabled = true;
+  showMessage("Fetching video… the first request can take up to a minute.");
+
+  try {
+    const r = await fetch(API + "/api/get", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: link })
+    });
+    const d = await r.json();
+    if (!r.ok || d.error) throw new Error(d.error || "Could not fetch video");
+
+    const video = document.createElement("video");
+    video.src = d.video;
+    video.controls = true;
+    video.playsInline = true;
+    if (d.thumb) video.poster = d.thumb;
+
+    const title = document.createElement("p");
+    title.className = "title";
+    title.textContent = d.title || "Reel";
+
+    const save = document.createElement("a");
+    save.className = "save";
+    save.textContent = "Save video ↓";
+    save.href = API + "/api/dl?url=" + encodeURIComponent(link);
+
+    out.append(video, title, save);
+    out.classList.add("show");
+    showMessage("Video ready.");
+  } catch (e) {
+    showMessage((e.message || "Server error") + ". Check the link and try again.", true);
+  } finally {
+    downloadBtn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
